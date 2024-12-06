@@ -495,6 +495,8 @@ Each metrics record contains tags such as SessionId and Hostname as additional i
 | `TotalReadTime` | Total number of milliseconds spent on read operation |
 | `RemoteBytesRead` | Number of bytes read by remote clients |
 | `RemoteBytesWritten` | Number of bytes written by remote clients |
+| `LocalBytesRead` | Number of bytes read by local clients |
+| `LocalBytesWritten` | Number of bytes written by local clients |
 | `BPServiceActorInfo` | The information about a block pool service actor |
 | `BlocksInPendingIBR` | Number of blocks in pending incremental block report (IBR) |
 | `BlocksReceivingInPendingIBR` | Number of blocks at receiving status in pending incremental block report (IBR) |
