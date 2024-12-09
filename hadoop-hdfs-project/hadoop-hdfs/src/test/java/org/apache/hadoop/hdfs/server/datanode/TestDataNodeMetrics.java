@@ -816,4 +816,31 @@ public class TestDataNodeMetrics {
       }, 100, 10000);
     }
   }
+
+  @Test
+  public void testLocalBytesMetrics() throws Exception {
+    Configuration conf = new HdfsConfiguration();
+    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    try {
+      cluster.waitActive();
+      FileSystem fs = cluster.getFileSystem();
+      Path testFile = new Path("/testLocalBytesMetrics.txt");
+      DFSTestUtil.createFile(fs, testFile, 10L, (short)1, 1L);
+      DFSTestUtil.readFile(fs, testFile);
+      List<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(1, datanodes.size());
+
+      DataNode datanode = datanodes.get(0);
+      MetricsRecordBuilder rb = getMetrics(datanode.getMetrics().name());
+
+      // Written by local client
+      assertCounter("LocalBytesWritten", 10L, rb);
+      // Read by local client
+      assertCounter("LocalBytesRead", 10L, rb);
+    } finally {
+      if (cluster != null) {
+        cluster.shutdown();
+      }
+    }
+  }
 }
