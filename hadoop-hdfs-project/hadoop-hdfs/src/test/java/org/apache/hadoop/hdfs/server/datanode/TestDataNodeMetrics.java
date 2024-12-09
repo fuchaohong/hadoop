@@ -18,6 +18,8 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY;
+import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CHECKSUM_TYPE_DEFAULT;
+import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CHECKSUM_TYPE_KEY;
 import static org.apache.hadoop.test.MetricsAsserts.assertCounter;
 import static org.apache.hadoop.test.MetricsAsserts.assertInverseQuantileGauges;
 import static org.apache.hadoop.test.MetricsAsserts.assertQuantileGauges;
@@ -44,6 +46,7 @@ import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.net.unix.DomainSocket;
 import org.apache.hadoop.net.unix.TemporarySocketDirectory;
+import org.apache.hadoop.util.DataChecksum;
 import org.apache.hadoop.util.Lists;
 import org.junit.Assume;
 import org.slf4j.Logger;
@@ -836,7 +839,10 @@ public class TestDataNodeMetrics {
       // Written by local client
       assertCounter("LocalBytesWritten", 10L, rb);
       // Read by local client
-      assertCounter("LocalBytesRead", 10L, rb);
+      String checksum = conf.get(DFS_CHECKSUM_TYPE_KEY,
+          DFS_CHECKSUM_TYPE_DEFAULT);
+      int checksumSize = DataChecksum.Type.valueOf(checksum).size;
+      assertCounter("LocalBytesRead", 10L + checksumSize, rb);
     } finally {
       if (cluster != null) {
         cluster.shutdown();
