@@ -1141,7 +1141,10 @@ public class TestObserverWithRouter {
     Configuration conf = getConfToEnableObserverReads(configSetting);
     conf.setBoolean("fs.hdfs.impl.disable.cache", true);
     FileSystem fileSystem2 = routerContext.getFileSystem(conf);
-    fileSystem2.msync();
+    if (fileSystem.getConf().getBoolean(
+        HdfsClientConfigKeys.DFS_RBF_OBSERVER_READ_ENABLE, false)){
+      fileSystem2.msync();
+    }
     fileSystem2.open(path).close();
 
     long observerCount2 = routerContext.getRouter().getRpcServer()
